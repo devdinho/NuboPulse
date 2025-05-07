@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 dotenv.config();
 
@@ -43,10 +44,7 @@ app.post('/hook', (req, res) => {
     if (files.includes(project)) {
       console.log(`Deploy do projeto ${project} iniciado`);
       
-      execSync(`cd ${projectPath}`);
-      execSync('git checkout .');
-      execSync('git pull origin main');
-      execSync('docker-compose up --build -d');
+      execSync(`cd ${projectPath} && git checkout . && git pull origin main && docker compose up --build -d`, { stdio: 'inherit' });
       
       res.status(200).send(`Deploy do projeto ${project} finalizado com sucesso`);
     } else {
