@@ -44,6 +44,7 @@ app.post('/hook', (req, res) => {
       console.log(`Deploy do projeto ${project} iniciado`);
       
       execSync(`cd ${projectPath}`);
+      execSync('git checkout .');
       execSync('git pull origin main');
       execSync('docker-compose up --build -d');
       
