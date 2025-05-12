@@ -12,9 +12,7 @@ async function broadcastDockerStats() {
       .trim()
       .split('\n')
       .map(line => JSON.parse(line));
-
-    console.log('Docker stats:', JSON.stringify(statsArray));
-    
+          
     resolve(JSON.stringify(statsArray));
   });
 }

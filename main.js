@@ -1,11 +1,15 @@
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
+const url = require('url');
 
 const app = express();
 const server = http.createServer(app);
+const dotenv = require('dotenv');
 
-// WebSockets com upgrade manual
+dotenv.config();
+const secretToken = process.env.WEBHOOK_SECRET;
+
 const systemInfoHandler = require('./routes/systemInfo');
 const dockerStatsHandler = require('./routes/dockerStats');
 const deployHandler = require('./routes/deploy');
@@ -13,7 +17,14 @@ const deployHandler = require('./routes/deploy');
 deployHandler(app);
 
 server.on('upgrade', (req, socket, head) => {
-  const pathname = req.url;
+  const { pathname, query } = url.parse(req.url, true);
+  const token = query.token;
+  
+  if (token !== secretToken) {
+    socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+    socket.destroy();
+    return;
+  }
 
   if (pathname === '/system-info') {
     systemInfoHandler.handleUpgrade(req, socket, head);
