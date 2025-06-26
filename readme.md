@@ -12,3 +12,25 @@
 | `Name`      | Nome amigável do container, definido na criação ou automaticamente gerado.                       |
 | `NetIO`     | Quantidade de dados transmitidos e recebidos via rede. Formato `"Enviado / Recebido"`.           |
 | `PIDs`      | Número de processos (Process IDs) em execução dentro do container.                               |
+
+
+#### Exemplo de serviço:
+
+```
+[Unit]
+Description=RepoWhisper Node.js App (Node 20 via NVM)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/<user>/<projetos>/RepoWhisper
+ExecStart=/home/<user>/<projetos>/RepoWhisper/start.sh
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+```
