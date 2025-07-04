@@ -21,6 +21,7 @@ module.exports = async function (app) {
     }
 
     const project = req.query.project;
+    const docker = req.query.docker;
 
     if (!project) {
       return res.status(400).send('Faltando parâmetro "project"');
@@ -39,6 +40,12 @@ module.exports = async function (app) {
       if (files.includes(project)) {
         console.log(`Deploy do projeto ${project} iniciado`);
         
+        if (docker !== 'true') {
+          console.log('Executando deploy sem Docker');
+          execSync(`cd ${projectPath} && git checkout . && git pull origin main`, { stdio: 'inherit' });
+          return res.status(200).send(`Deploy do projeto ${project} finalizado com sucesso`);
+        }
+
         execSync(`cd ${projectPath} && git checkout . && git pull origin main && docker compose up --build -d`, { stdio: 'inherit' });
         
         res.status(200).send(`Deploy do projeto ${project} finalizado com sucesso`);
