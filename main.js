@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
-const WebSocket = require('ws');
+const socketIO = require('socket.io');
+
 const url = require('url');
 
 const app = express();
@@ -13,6 +14,17 @@ const secretToken = process.env.WEBHOOK_SECRET;
 const systemInfoHandler = require('./routes/systemInfo');
 const dockerStatsHandler = require('./routes/dockerStats');
 const deployHandler = require('./routes/deploy');
+const { setupTerminal } = require('./routes/terminal');
+
+const io = socketIO(server, {
+  path: '/terminal/socket.io',
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  }
+});
+
+setupTerminal(io);
 
 deployHandler(app);
 
