@@ -1,4 +1,4 @@
-# RepoWhisper
+# NuboPulse
 ## 🧾 Explicação de cada campo:
 
 | Campo       | Descrição                                                                                        |
@@ -18,13 +18,13 @@
 
 ```
 [Unit]
-Description=RepoWhisper Node.js App (Node 20 via NVM)
+Description=Nubo Pulse Node.js App (Node 20 via NVM)
 After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/<user>/<projetos>/RepoWhisper
-ExecStart=/home/<user>/<projetos>/RepoWhisper/start.sh
+WorkingDirectory=/home/<user>/<projetos>/NuboPulse
+ExecStart=/home/<user>/<projetos>/NuboPulse/start.sh
 Restart=always
 RestartSec=10
 Environment=NODE_ENV=production
