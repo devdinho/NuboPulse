@@ -42,11 +42,11 @@ module.exports = async function (app) {
         
         if (docker !== 'true') {
           console.log('Executando deploy sem Docker');
-          execSync(`cd ${projectPath} && git checkout . && git pull origin main`, { stdio: 'inherit' });
+          execSync(`cd ${projectPath} && git pull origin main`, { stdio: 'inherit' });
           return res.status(200).send(`Deploy do projeto ${project} finalizado com sucesso`);
         }
 
-        execSync(`cd ${projectPath} && git checkout . && git pull origin main && docker compose up --build -d`, { stdio: 'inherit' });
+        execSync(`cd ${projectPath} && git pull origin main && docker compose up --build -d`, { stdio: 'inherit' });
         
         res.status(200).send(`Deploy do projeto ${project} finalizado com sucesso`);
       } else {
