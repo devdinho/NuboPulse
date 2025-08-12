@@ -10,7 +10,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 const secretToken = process.env.WEBHOOK_SECRET;
-const originUrl = process.env.ORIGIN_URL || 'https://nubo.dinho.dev';
+const originUrl = process.env.ORIGIN_URL || 'https://nubo.a6n.tech';
 
 const systemInfoHandler = require('./routes/systemInfo');
 const dockerStatsHandler = require('./routes/dockerStats');
