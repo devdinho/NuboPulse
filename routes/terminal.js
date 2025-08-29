@@ -1,49 +1,44 @@
 const pty = require('node-pty');
 
-/**
- * Registra o namespace `/terminal` no socket.io
- * @param {import('socket.io').Server} io
- */
+const WebSocket = require('ws');
 
-const secretToken = process.env.WEBHOOK_SECRET;
+function handleUpgrade(req, socket, head) {
+  const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';
+  const term = pty.spawn(shell, [], {
+    name: 'xterm-color',
+    cols: 80,
+    rows: 24,
+    cwd: process.env.HOME,
+    env: process.env
+  });
 
-function setupTerminal(io) {
-  const terminalNamespace = io.of('/terminal');
-
-  terminalNamespace.on('connection', (socket) => {
-    const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';
-    const term = pty.spawn(shell, [], {
-      name: 'xterm-color',
-      cols: 80,
-      rows: 24,
-      cwd: process.env.HOME,
-      env: process.env
+  // Criar WebSocket nativo
+  const wss = new WebSocket.Server({ noServer: true });
+  wss.handleUpgrade(req, socket, head, function done(ws) {
+    ws.on('message', function incoming(message) {
+      // Espera JSON: {type: 'input'|'resize', data}
+      try {
+        const msg = JSON.parse(message);
+        if (msg.type === 'input') {
+          term.write(msg.data);
+        } else if (msg.type === 'resize') {
+          const { cols, rows } = msg.data;
+          term.resize(cols, rows);
+        }
+      } catch (e) {
+        // Ignora mensagens inválidas
+      }
     });
-
-    const token = socket.handshake.auth.token;
-
-    if (!token || token !== secretToken) {
-        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-        return socket.disconnect();
-    }
 
     term.on('data', (data) => {
-      socket.emit('output', data);
+      ws.send(JSON.stringify({ type: 'output', data }));
     });
 
-    socket.on('input', (data) => {
-      term.write(data);
-    });
-
-    socket.on('resize', ({ cols, rows }) => {
-      term.resize(cols, rows);
-    });
-
-    socket.on('disconnect', () => {
+    ws.on('close', () => {
       term.kill();
       console.log('Cliente desconectado do terminal.');
     });
   });
 }
 
-module.exports = { setupTerminal };
+module.exports = { handleUpgrade };
