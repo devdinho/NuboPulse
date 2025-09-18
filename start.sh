@@ -1,4 +1,3 @@
 #!/bin/bash
-source /root/.nvm/nvm.sh
-nvm use 22
-npm run start
+cd /home/fabrica/projects/nubopulse
+/root/.nvm/versions/node/v22.17.0/bin/npm run start
